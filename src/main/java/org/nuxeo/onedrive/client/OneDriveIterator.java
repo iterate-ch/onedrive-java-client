@@ -1,25 +1,34 @@
 package org.nuxeo.onedrive.client;
 
 import com.eclipsesource.json.JsonObject;
-import org.nuxeo.onedrive.client.*;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Objects;
 
 public class OneDriveIterator<E> implements Iterator<E> {
     private final OneDriveAPI api;
-    private final URL endPoint;
+    private final String endPoint;
     private final ObjectCheck objectCheck;
     private final ObjectWorker<E> objectWorker;
     private final JsonObjectIterator jsonObjectIterator;
 
-    public OneDriveIterator(OneDriveAPI api, URL endPoint, ObjectCheck objectCheck, ObjectWorker<E> objectWorker) {
+    public OneDriveIterator(OneDriveAPI api, String endPoint, ObjectCheck objectCheck, ObjectWorker<E> objectWorker) throws OneDriveRuntimeException {
         this.api = Objects.requireNonNull(api);
         this.endPoint = Objects.requireNonNull(endPoint);
         this.objectCheck = objectCheck;
         this.objectWorker = objectWorker;
-        this.jsonObjectIterator = new JsonObjectIterator(api, endPoint);
+
+        final String urlString = api.getBaseURL() + endPoint;
+        final URL url;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            throw new OneDriveRuntimeException(new OneDriveAPIException(e.getMessage(), e));
+        }
+
+        this.jsonObjectIterator = new JsonObjectIterator(api, url);
     }
 
     @Override
