@@ -2,6 +2,8 @@ package org.nuxeo.onedrive.client;
 
 import org.junit.Test;
 
+import java.util.logging.Logger;
+
 import static org.junit.Assert.assertEquals;
 
 public class OneDriveItemBuilderTest extends OneDriveTestCase {
@@ -49,6 +51,13 @@ public class OneDriveItemBuilderTest extends OneDriveTestCase {
     }
 
     @Test
+    public void testDriveNullFolderPathWhitespaced() {
+        OneDriveFolder folder = new OneDriveFolder(api, "FOLDERPATH WHITE", OneDriveResource.ResourceIdentifierType.Path);
+        assertEquals("/v1.0/drive/root:/FOLDERPATH%20WHITE", folder.getMetadataURL().build(api.getBaseURL(), folder.getResourceIdentifier()).getPath());
+        assertEquals("/v1.0/drive/root:/FOLDERPATH%20WHITE:/children", folder.getChildrenURL().build(api.getBaseURL(), folder.getResourceIdentifier()).getPath());
+    }
+
+    @Test
     public void testDriveFolderNull() {
         OneDriveDrive testDrive = new OneDriveDrive(api, "DRIVEID");
         OneDriveFolder folder = new OneDriveFolder(api, testDrive);
@@ -70,5 +79,14 @@ public class OneDriveItemBuilderTest extends OneDriveTestCase {
         OneDriveFolder folder = new OneDriveFolder(api, testDrive, "FOLDERPATH");
         assertEquals("/v1.0/drives/DRIVEID/root:/FOLDERPATH", folder.getMetadataURL().build(api.getBaseURL(), folder.getResourceIdentifier()).getPath());
         assertEquals("/v1.0/drives/DRIVEID/root:/FOLDERPATH:/children", folder.getChildrenURL().build(api.getBaseURL(), folder.getResourceIdentifier()).getPath());
+    }
+
+    @Test
+    public void testDriveFolderPathWhitespaced() {
+        OneDriveDrive testDrive = new OneDriveDrive(api, "DRIVEID");
+        OneDriveFolder folder = new OneDriveFolder(api, testDrive, "FOLDERPATH WHITE");
+        Logger.getGlobal().info(folder.getMetadataURL().build(api.getBaseURL(), folder.getResourceIdentifier()).toString());
+        assertEquals("/v1.0/drives/DRIVEID/root:/FOLDERPATH%20WHITE", folder.getMetadataURL().build(api.getBaseURL(), folder.getResourceIdentifier()).getPath());
+        assertEquals("/v1.0/drives/DRIVEID/root:/FOLDERPATH%20WHITE:/children", folder.getChildrenURL().build(api.getBaseURL(), folder.getResourceIdentifier()).getPath());
     }
 }
