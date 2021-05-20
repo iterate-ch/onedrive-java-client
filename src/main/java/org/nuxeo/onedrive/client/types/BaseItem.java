@@ -36,6 +36,7 @@ public abstract class BaseItem {
     public abstract Metadata getMetadata() throws IOException;
 
     public abstract class Metadata<T extends Metadata<T>> extends GraphType<T> {
+        private String id;
         private OneDriveIdentitySet createdBy;
         private ZonedDateTime createdDateTime;
         private String description;
@@ -44,9 +45,12 @@ public abstract class BaseItem {
         private ZonedDateTime lastModifiedDateTime;
         private String name;
         private ItemReference parentReference;
-        public String webUrl;
+        private String webUrl;
 
         public String getId() {
+            if (id != null) {
+                return id;
+            }
             return BaseItem.this.id;
         }
 
@@ -93,6 +97,9 @@ public abstract class BaseItem {
         @Override
         protected void parseMember(JsonObject.Member member) {
             switch (member.getName()) {
+                case "id":
+                    id = member.getValue().asString();
+                    break;
                 case "createdBy":
                     createdBy = new OneDriveIdentitySet(member.getValue().asObject());
                     break;
