@@ -7,26 +7,28 @@ import java.net.URL;
 import java.util.Iterator;
 
 public final class Sites {
-    public static Iterator<Site.Metadata> getSites(final Site site) {
-        return new SitesIterator(site.getApi(), createSitesUrl(site));
+    public static Iterator<Site.Metadata> getSites(final Site site, final Site.Select... expand) {
+        return new SitesIterator(site.getApi(), createSitesUrl(site, expand));
     }
 
-    public static Iterator<Site.Metadata> getSites(final OneDriveAPI api) {
-        return new SitesIterator(api, createSitesUrl(api, ""));
+    public static Iterator<Site.Metadata> getSites(final OneDriveAPI api, final Site.Select... expand) {
+        return new SitesIterator(api, createSitesUrl(api, "", expand));
     }
 
-    public static Iterator<Site.Metadata> getSites(final OneDriveAPI api, final String search) {
-        final QueryStringBuilder qs = new QueryStringBuilder();
-        qs.set("search", search);
+    public static Iterator<Site.Metadata> getSites(final OneDriveAPI api, final String search, final Site.Select... expand) {
+        final QueryStringBuilder qs = new QueryStringBuilder()
+                .set("search", search)
+                .set("expand", expand);
         return new SitesIterator(api, createSitesUrl(api, qs, ""));
     }
 
-    private static URL createSitesUrl(final Site site) {
-        return new URLTemplate(site.getAction("/sites")).build(site.getApi().getBaseURL());
+    private static URL createSitesUrl(final Site site, final Site.Select... expand) {
+        return new URLTemplate(site.getAction("/sites")).build(site.getApi().getBaseURL(),
+                new QueryStringBuilder().set("expand", expand));
     }
 
-    private static URL createSitesUrl(final OneDriveAPI api, final String basePath) {
-        return new URLTemplate(createSitesPath(basePath)).build(api.getBaseURL());
+    private static URL createSitesUrl(final OneDriveAPI api, final String basePath, final Site.Select... expand) {
+        return createSitesUrl(api, new QueryStringBuilder().set("expand", expand), basePath);
     }
 
     private static URL createSitesUrl(final OneDriveAPI api, final QueryStringBuilder qs, final String basePath) {

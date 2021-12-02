@@ -3,10 +3,7 @@ package org.nuxeo.onedrive.client.types;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import org.nuxeo.onedrive.client.OneDriveAPI;
-import org.nuxeo.onedrive.client.OneDriveJsonRequest;
-import org.nuxeo.onedrive.client.OneDriveJsonResponse;
-import org.nuxeo.onedrive.client.URLTemplate;
+import org.nuxeo.onedrive.client.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -60,8 +57,7 @@ public class Site extends BaseItem {
         String path;
         if (identifier == SiteIdentifier.Path) {
             path = ":" + getId();
-        }
-        else {
+        } else {
             path = "/sites/" + getId();
         }
 
@@ -87,7 +83,13 @@ public class Site extends BaseItem {
 
     @Override
     public Metadata getMetadata() throws IOException {
-        final URL url = new URLTemplate(getBasePath()).build(getApi().getBaseURL());
+        return getMetadata((Select[]) null);
+    }
+
+    public Metadata getMetadata(final Select... expand) throws IOException {
+        final QueryStringBuilder builder = new QueryStringBuilder()
+                .set("expand", expand);
+        final URL url = new URLTemplate(getBasePath()).build(getApi().getBaseURL(), builder);
         final OneDriveJsonRequest request = new OneDriveJsonRequest(url, "GET");
         try (final OneDriveJsonResponse response = request.sendRequest(getApi().getExecutor())) {
             JsonObject jsonObject = response.getContent();
@@ -117,6 +119,21 @@ public class Site extends BaseItem {
     public static Site.Metadata fromJson(final OneDriveAPI api, final JsonObject jsonObject) {
         final String id = jsonObject.get("id").asString();
         return new Site(api, id, SiteIdentifier.Id).new Metadata().fromJson(jsonObject);
+    }
+
+    public enum Select implements QueryStringCommaParameter {
+        SharepointIDs("sharepointIds");
+
+        private final String key;
+
+        Select(final String key) {
+            this.key = key;
+        }
+
+        @Override
+        public String getKey() {
+            return key;
+        }
     }
 
     public class Metadata extends BaseItem.Metadata<Metadata> {
