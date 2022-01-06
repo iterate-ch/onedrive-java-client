@@ -163,7 +163,8 @@ public final class Files {
 
     public static Iterator<DriveItem.Metadata> getSharedWithMe(final User user) {
         return new ItemIterator(user.getApi(),
-                new URLTemplate(user.getOperationPath("/drive/sharedWithMe")).build(user.getApi().getBaseURL()));
+                new URLTemplate(user.getOperationPath("/drive/sharedWithMe")).build(user.getApi().getBaseURL(), new QueryStringBuilder()
+                        .set("allowExternal", true)));
     }
 
     private final static class ItemIterator implements Iterator<DriveItem.Metadata> {
