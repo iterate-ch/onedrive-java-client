@@ -18,6 +18,13 @@ import java.util.List;
 import java.util.Objects;
 
 public final class Files {
+    private static String versionAction(String version) {
+        return "/versions/" + version;
+    }
+    private static String versionAction(String version, String action) {
+        return versionAction(version) + action;
+    }
+
     private static URL getChildrenUrl(DriveItem item) {
         return new URLTemplate(item.getAction("/children")).build(item.getApi().getBaseURL());
     }
@@ -29,6 +36,18 @@ public final class Files {
 
     private static URL getContentUrl(DriveItem item) {
         return new URLTemplate(item.getAction("/content")).build(item.getApi().getBaseURL());
+    }
+
+    private static URL getContentUrl(DriveItem item, String version) {
+        return new URLTemplate(item.getAction(versionAction(version, "/content"))).build(item.getApi().getBaseURL());
+    }
+
+    private static URL getVersionUrl(DriveItem item, String version) {
+        return new URLTemplate(item.getAction(versionAction(version))).build(item.getApi().getBaseURL());
+    }
+
+    private static URL getVersionRestoreUrl(DriveItem item, String version) {
+        return new URLTemplate(item.getAction(versionAction(version, "/restoreVersion"))).build(item.getApi().getBaseURL());
     }
 
     private static URL getVersionsUrl(DriveItem item) {
@@ -84,6 +103,18 @@ public final class Files {
         return versions;
     }
 
+    public static DriveItemVersion version(DriveItem item, String version) throws IOException {
+        final URL url = getVersionUrl(item, version);
+        OneDriveJsonRequest request = new OneDriveJsonRequest(url, "GET");
+        OneDriveJsonResponse response = request.sendRequest(item.getApi().getExecutor());
+        return new DriveItemVersion().fromJson(response.getContent());
+    }
+
+    public static void restore(DriveItem item, String version) throws IOException {
+        final URL url = getVersionRestoreUrl(item, version);
+        new OneDriveRequest(url, "POST").sendRequest(item.getApi().getExecutor(), new NullInputStream(0)).close();
+    }
+
     public static InputStream download(DriveItem item) throws IOException {
         final URL url = getContentUrl(item);
         OneDriveRequest request = new OneDriveRequest(url, "GET");
@@ -93,6 +124,23 @@ public final class Files {
 
     public static InputStream download(DriveItem item, String range) throws IOException {
         final URL url = getContentUrl(item);
+        OneDriveRequest request = new OneDriveRequest(url, "GET");
+        request.addHeader("Range", String.format("bytes=%s", range));
+        // Disable compression
+        request.addHeader("Accept-Encoding", "identity");
+        OneDriveResponse response = request.sendRequest(item.getApi().getExecutor());
+        return response.getContent();
+    }
+
+    public static InputStream downloadVersion(DriveItem item, String version) throws IOException {
+        final URL url = getContentUrl(item, version);
+        OneDriveRequest request = new OneDriveRequest(url, "GET");
+        OneDriveResponse response = request.sendRequest(item.getApi().getExecutor());
+        return response.getContent();
+    }
+
+    public static InputStream downloadVersion(DriveItem item, String version, String range) throws IOException {
+        final URL url = getContentUrl(item, version);
         OneDriveRequest request = new OneDriveRequest(url, "GET");
         request.addHeader("Range", String.format("bytes=%s", range));
         // Disable compression
