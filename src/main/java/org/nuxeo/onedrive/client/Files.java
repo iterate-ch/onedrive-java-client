@@ -4,10 +4,7 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import org.apache.commons.io.input.NullInputStream;
-import org.nuxeo.onedrive.client.types.DriveItem;
-import org.nuxeo.onedrive.client.types.DriveItemVersion;
-import org.nuxeo.onedrive.client.types.Permission;
-import org.nuxeo.onedrive.client.types.User;
+import org.nuxeo.onedrive.client.types.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +18,7 @@ public final class Files {
     private static String versionAction(String version) {
         return "/versions/" + version;
     }
+
     private static String versionAction(String version, String action) {
         return versionAction(version) + action;
     }
@@ -64,6 +62,10 @@ public final class Files {
 
     private static URL getCheckOutUrl(DriveItem item) {
         return new URLTemplate(item.getAction("/checkout")).build(item.getApi().getBaseURL());
+    }
+
+    private static URL getPublicationUrl(DriveItem item) {
+        return new URLTemplate(item.getAction("/publication")).build(item.getApi().getBaseURL());
     }
 
     public static DriveItem.Metadata createFile(DriveItem parent, String filename, String mimeType) throws IOException {
@@ -177,6 +179,10 @@ public final class Files {
         final JsonObject root = new JsonObject();
         root.add("comment", comment);
         new OneDriveJsonRequest(getCheckInUrl(item), "POST", root).sendRequest(item.getApi().getExecutor()).close();
+    }
+
+    public static Publication publication(DriveItem item) throws IOException {
+        return new Publication().fromJson(new OneDriveJsonRequest(getPublicationUrl(item), "GET").sendRequest(item.getApi().getExecutor()).getContent());
     }
 
     public static OneDriveLongRunningAction copy(DriveItem item, CopyOperation copy) throws IOException {
