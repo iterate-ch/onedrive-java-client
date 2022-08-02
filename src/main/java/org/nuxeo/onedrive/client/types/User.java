@@ -58,16 +58,16 @@ public class User extends DirectoryObject {
         private Optional<String> creationType;
         private String userPrincipalName;
 
+        public Metadata(final JsonObject jsonObject) {
+            super(jsonObject);
+        }
+
         public Optional<String> getCreationType() {
             return creationType;
         }
 
         public String getUserPrincipalName() {
             return userPrincipalName;
-        }
-
-        public Metadata(final JsonObject jsonObject) {
-            super(jsonObject);
         }
 
         @Override

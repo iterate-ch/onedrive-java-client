@@ -1,8 +1,10 @@
 package org.nuxeo.onedrive.client.types;
 
 import com.eclipsesource.json.JsonObject;
+import org.nuxeo.onedrive.client.ODataQuery;
 import org.nuxeo.onedrive.client.OneDriveAPI;
 import org.nuxeo.onedrive.client.OneDriveIdentitySet;
+import org.nuxeo.onedrive.client.QueryStringCommaParameter;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -33,7 +35,7 @@ public abstract class BaseItem {
 
     public abstract String getAction(final String action);
 
-    public abstract Metadata getMetadata() throws IOException;
+    public abstract Metadata getMetadata(final ODataQuery query) throws IOException;
 
     public abstract class Metadata<T extends Metadata<T>> extends GraphType<T> {
         private String id;
@@ -130,6 +132,28 @@ public abstract class BaseItem {
                 default:
                     super.parseMember(member);
             }
+        }
+    }
+
+    public interface IBaseItemProperty extends QueryStringCommaParameter {
+    }
+
+    public enum Property implements IBaseItemProperty {
+        Id,
+        CreatedBy,
+        CreatedDateTime,
+        Description,
+        ETag,
+        LastModifiedBy,
+        LastModifiedDateTime,
+        Name,
+        ParentReference,
+        WebURL;
+
+
+        @Override
+        public String getKey() {
+            return name();
         }
     }
 }

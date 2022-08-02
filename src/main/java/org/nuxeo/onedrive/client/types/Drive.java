@@ -7,6 +7,7 @@ import org.nuxeo.onedrive.client.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Drive extends BaseItem {
@@ -42,6 +43,12 @@ public class Drive extends BaseItem {
         this.parent = new DirectoryObjectParent(parent);
     }
 
+    private static List<DriveItem.Metadata> map(JsonArray array, OneDriveAPI api) {
+        return array.values().stream()
+                .map(x -> DriveItem.parseJson(api, x.asObject()))
+                .collect(Collectors.toList());
+    }
+
     @Override
     public String getPath() {
         final String id = getId();
@@ -71,11 +78,35 @@ public class Drive extends BaseItem {
     }
 
     @Override
-    public Metadata getMetadata() throws IOException {
-        final URL url = new URLTemplate(getPath()).build(getApi().getBaseURL());
+    public Metadata getMetadata(final ODataQuery query) throws IOException {
+        final URL url = new URLTemplate(getPath()).build(getApi().getBaseURL(), query);
         OneDriveJsonRequest request = new OneDriveJsonRequest(url, "GET");
         OneDriveJsonResponse response = request.sendRequest(getApi().getExecutor());
         return new Metadata().fromJson(response.getContent());
+    }
+
+    public enum DriveType {
+        personal, business, documentLibrary
+    }
+
+    public enum Property implements IDriveProperty {
+        DriveType,
+        Following,
+        Items,
+        Owner,
+        Quota,
+        Root,
+        SharepointIds,
+        Special,
+        System;
+
+        @Override
+        public String getKey() {
+            return name();
+        }
+    }
+
+    public interface IDriveProperty extends IBaseItemProperty {
     }
 
     private static abstract class DriveParent<T> {
@@ -102,18 +133,7 @@ public class Drive extends BaseItem {
         }
     }
 
-    public enum DriveType {
-        personal, business, documentLibrary
-    }
-
-    private static List<DriveItem.Metadata> map(JsonArray array, OneDriveAPI api) {
-        return array.values().stream()
-                .map(x -> DriveItem.parseJson(api, x.asObject()))
-                .collect(Collectors.toList());
-    }
-
     public class Metadata extends BaseItem.Metadata<Metadata> {
-        private String id;
         private DriveType driveType;
         private List<DriveItem.Metadata> following;
         private List<DriveItem.Metadata> items;
@@ -123,11 +143,6 @@ public class Drive extends BaseItem {
         private SharePointIds sharePointIds;
         private List<DriveItem.Metadata> special;
         // private System system;
-
-        @Override
-        public String getId() {
-            return id;
-        }
 
         public DriveType getDriveType() {
             return driveType;
@@ -164,9 +179,6 @@ public class Drive extends BaseItem {
         @Override
         protected void parseMember(JsonObject.Member member) {
             switch (member.getName()) {
-                case "id":
-                    id = member.getValue().asString();
-                    break;
                 case "driveType":
                     driveType = DriveType.valueOf(member.getValue().asString());
                     break;

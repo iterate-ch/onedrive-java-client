@@ -39,7 +39,7 @@ public class TestOneDriveFolder extends OneDriveTestCase {
         // Test
         Drive drive = new Drive(api, "5FGB3N6V49HN725573R8LG588VRDPMJV36");
         DriveItem folder = new DriveItem(drive);
-        DriveItem.Metadata metadata = folder.getMetadata();
+        DriveItem.Metadata metadata = folder.getMetadata(null);
         assertTrue(metadata.isFolder());
         assertEquals("Test", metadata.getName());
         assertNotNull(metadata.getParentReference());

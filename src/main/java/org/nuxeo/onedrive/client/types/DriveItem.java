@@ -2,15 +2,13 @@ package org.nuxeo.onedrive.client.types;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import org.nuxeo.onedrive.client.OneDriveAPI;
-import org.nuxeo.onedrive.client.OneDriveJsonRequest;
-import org.nuxeo.onedrive.client.OneDriveJsonResponse;
-import org.nuxeo.onedrive.client.URLTemplate;
+import org.nuxeo.onedrive.client.*;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class DriveItem extends BaseItem {
     private final ParentReference parent;
@@ -35,6 +33,20 @@ public class DriveItem extends BaseItem {
         super(parent.getApi(), path);
         this.parent = new ItemParent(parent);
         this.itemIdentifierType = ItemIdentifierType.Path;
+    }
+
+    public static DriveItem.Metadata parseJson(final OneDriveAPI api, final JsonObject jsonObject) {
+        final String id = jsonObject.get("id").asString();
+
+        final Drive drive;
+        final JsonValue parentReference = jsonObject.get("parentReference");
+        if (null == parentReference) {
+            drive = new Drive(api);
+        } else {
+            drive = new Drive(api, parentReference.asObject().get("driveId").asString());
+        }
+        final DriveItem item = new DriveItem(drive, id);
+        return item.new Metadata().fromJson(jsonObject);
     }
 
     public ItemIdentifierType getItemIdentifierType() {
@@ -96,8 +108,8 @@ public class DriveItem extends BaseItem {
     }
 
     @Override
-    public Metadata getMetadata() throws IOException {
-        final URL url = new URLTemplate(getPath()).build(getApi().getBaseURL());
+    public Metadata getMetadata(final ODataQuery query) throws IOException {
+        final URL url = new URLTemplate(getPath()).build(getApi().getBaseURL(), query);
         OneDriveJsonRequest request = new OneDriveJsonRequest(url, "GET");
         OneDriveJsonResponse response = request.sendRequest(getApi().getExecutor());
         return new Metadata().fromJson(response.getContent());
@@ -108,18 +120,44 @@ public class DriveItem extends BaseItem {
         Path
     }
 
-    public static DriveItem.Metadata parseJson(final OneDriveAPI api, final JsonObject jsonObject) {
-        final String id = jsonObject.get("id").asString();
+    public enum Property implements IDriveItemProperty {
+        CTag,
+        RemoteItem,
+        Size,
+        WebDavUrl,
+        File,
+        FileSystemInfo,
+        Folder,
+        Audio,
+        Content,
+        Deleted,
+        Image,
+        Location,
+        PendingOperations,
+        Photo,
+        Publication,
+        Root,
+        SearchResult,
+        Shared,
+        SpecialFolder,
+        Video,
+        Activities,
+        Analytics,
+        Children,
+        CreatedByUser,
+        LastModifiedByUser,
+        Permissions,
+        Subscriptions,
+        Thumbnails,
+        Versions;
 
-        final Drive drive;
-        final JsonValue parentReference = jsonObject.get("parentReference");
-        if (null == parentReference) {
-            drive = new Drive(api);
-        } else {
-            drive = new Drive(api, parentReference.asObject().get("driveId").asString());
+        @Override
+        public String getKey() {
+            return name();
         }
-        final DriveItem item = new DriveItem(drive, id);
-        return item.new Metadata().fromJson(jsonObject);
+    }
+
+    public interface IDriveItemProperty extends IBaseItemProperty {
     }
 
     private static abstract class ParentReference<T> {
@@ -147,13 +185,11 @@ public class DriveItem extends BaseItem {
     }
 
     public class Metadata extends BaseItem.Metadata<Metadata> {
+        private final Map<Class, Facet> facetMap = new HashMap<>();
         private String cTag;
-        private String description;
         private DriveItem.Metadata remoteItem;
         private Long size;
         private String webDavUrl;
-
-        private final Map<Class, Facet> facetMap = new HashMap<>();
 
         public Package getPackage() {
             return getFacet(Package.class);
@@ -165,6 +201,10 @@ public class DriveItem extends BaseItem {
 
         public Folder getFolder() {
             return getFacet(Folder.class);
+        }
+
+        public Publication getPublication() {
+            return getFacet(Publication.class);
         }
 
         public boolean isPackage() {
@@ -181,11 +221,6 @@ public class DriveItem extends BaseItem {
 
         public String getcTag() {
             return cTag;
-        }
-
-        @Override
-        public String getDescription() {
-            return description;
         }
 
         public Metadata getRemoteItem() {
@@ -209,10 +244,6 @@ public class DriveItem extends BaseItem {
             switch (member.getName()) {
                 case "cTag":
                     cTag = member.getValue().asString();
-                    break;
-
-                case "description":
-                    description = member.getValue().asString();
                     break;
 
                 case "remoteItem":
@@ -239,6 +270,10 @@ public class DriveItem extends BaseItem {
                     facetMap.put(Folder.class, new Folder().fromJson(member.getValue().asObject()));
                     break;
 
+                case "publication":
+                    facetMap.put(Publication.class, new Publication().fromJson(member.getValue().asObject()));
+                    break;
+
                 // Properties
                 case "audio":
                 case "content":
@@ -247,7 +282,6 @@ public class DriveItem extends BaseItem {
                 case "location":
                 case "pendingOperations":
                 case "photo":
-                case "publication":
                 case "root":
                 case "searchResult":
                 case "shared":

@@ -23,13 +23,8 @@ public final class Files {
         return versionAction(version) + action;
     }
 
-    private static URL getChildrenUrl(DriveItem item) {
-        return new URLTemplate(item.getAction("/children")).build(item.getApi().getBaseURL());
-    }
-
-    private static URL getChildrenUrl(DriveItem item, int limit) {
-        QueryStringBuilder builder = new QueryStringBuilder().set("top", limit);
-        return new URLTemplate(item.getAction("/children")).build(item.getApi().getBaseURL(), builder);
+    private static URL getChildrenUrl(DriveItem item, final ODataQuery query) {
+        return new URLTemplate(item.getAction("/children")).build(item.getApi().getBaseURL(), query);
     }
 
     private static URL getContentUrl(DriveItem item) {
@@ -81,7 +76,7 @@ public final class Files {
     }
 
     public static DriveItem.Metadata createFolder(DriveItem parent, String foldername) throws IOException {
-        final URL url = getChildrenUrl(parent);
+        final URL url = getChildrenUrl(parent, null);
         final JsonObject rootObject = new JsonObject();
         rootObject.add("name", foldername);
         rootObject.add("folder", new JsonObject());
@@ -193,12 +188,8 @@ public final class Files {
         return new OneDriveLongRunningAction(locationUrl, api);
     }
 
-    public static Iterator<DriveItem.Metadata> getFiles(final DriveItem folder) {
-        return new ItemIterator(folder.getApi(), getChildrenUrl(folder));
-    }
-
-    public static Iterator<DriveItem.Metadata> getFiles(final DriveItem folder, int limit) {
-        return new ItemIterator(folder.getApi(), getChildrenUrl(folder, limit));
+    public static Iterator<DriveItem.Metadata> getFiles(final DriveItem folder, final ODataQuery query) {
+        return new ItemIterator(folder.getApi(), getChildrenUrl(folder, query));
     }
 
     public static Iterator<DriveItem.Metadata> search(DriveItem item, String search) {

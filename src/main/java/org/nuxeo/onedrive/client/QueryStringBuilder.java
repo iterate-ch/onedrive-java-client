@@ -18,12 +18,15 @@
  */
 package org.nuxeo.onedrive.client;
 
+import sun.swing.StringUIClientPropertyKey;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @since 1.0
@@ -51,6 +54,20 @@ public class QueryStringBuilder {
 
     public QueryStringBuilder set(String key, QueryStringCommaParameter... parameters) {
         if(parameters != null && parameters.length > 0) {
+            StringBuilder builder = new StringBuilder();
+            for(QueryStringCommaParameter parameter : parameters) {
+                if(builder.length() > 0) {
+                    builder.append(",");
+                }
+                builder.append(parameter.getKey());
+            }
+            this.parameters.put(key, builder.toString());
+        }
+        return this;
+    }
+
+    public QueryStringBuilder set(String key, Set<QueryStringCommaParameter> parameters) {
+        if(parameters != null && parameters.size() > 0) {
             StringBuilder builder = new StringBuilder();
             for(QueryStringCommaParameter parameter : parameters) {
                 if(builder.length() > 0) {

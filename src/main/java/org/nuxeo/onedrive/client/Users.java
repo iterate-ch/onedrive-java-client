@@ -11,8 +11,7 @@ import java.util.Iterator;
 
 public class Users {
 
-    public static User.Metadata get(final User user, final User.Select... select) throws IOException {
-        final QueryStringBuilder query = new QueryStringBuilder().set("$select", select);
+    public static User.Metadata get(final User user, final ODataQuery query) throws IOException {
         final URL url = new URLTemplate(user.getPath()).build(user.getApi().getBaseURL(), query);
         final OneDriveJsonRequest request = new OneDriveJsonRequest(url, "GET");
         final OneDriveJsonResponse response = request.sendRequest(user.getApi().getExecutor());

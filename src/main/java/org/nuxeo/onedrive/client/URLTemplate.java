@@ -21,6 +21,7 @@ package org.nuxeo.onedrive.client;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @since 1.0
@@ -29,11 +30,7 @@ public class URLTemplate {
 
     public static final URLTemplate EMPTY_TEMPLATE = new URLTemplate("");
 
-    private String template;
-
-    public String getTemplate() {
-        return template;
-    }
+    private final String template;
 
     public URLTemplate(String template) {
         this.template = Objects.requireNonNull(template);
@@ -64,5 +61,18 @@ public class URLTemplate {
         } catch (MalformedURLException e) {
             throw new OneDriveRuntimeException(new OneDriveAPIException(e.getMessage(), e));
         }
+    }
+
+    public URL build(String base, final ODataQuery query, Object... values) {
+        String urlString = String.format(base + this.template, values) + ODataQuery.get(query);
+        try {
+            return new URL(urlString);
+        } catch (MalformedURLException e) {
+            throw new OneDriveRuntimeException(new OneDriveAPIException(e.getMessage(), e));
+        }
+    }
+
+    public String getTemplate() {
+        return template;
     }
 }

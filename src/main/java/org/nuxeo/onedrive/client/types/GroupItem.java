@@ -19,8 +19,7 @@ public class GroupItem extends DirectoryObject {
         return "/groups/" + getId();
     }
 
-    public Metadata getMetadata(OneDriveExpand... expands) throws IOException {
-        QueryStringBuilder query = new QueryStringBuilder().set("expand", expands);
+    public Metadata getMetadata(final ODataQuery query) throws IOException {
         final URL url = new URLTemplate(getPath()).build(getApi().getBaseURL(), query);
         OneDriveJsonRequest request = new OneDriveJsonRequest(url, "GET");
         OneDriveJsonResponse response = request.sendRequest(getApi().getExecutor());
