@@ -148,7 +148,7 @@ public abstract class BaseItem {
         LastModifiedDateTime,
         Name,
         ParentReference,
-        WebURL;
+        WebUrl;
 
 
         @Override

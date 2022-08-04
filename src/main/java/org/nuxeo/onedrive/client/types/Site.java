@@ -117,14 +117,23 @@ public class Site extends BaseItem {
 
     public enum Property implements ISiteProperty {
         Analytics,
+        Columns,
         ContentTypes,
+        DisplayName,
         Drive,
         Drives,
         Items,
         Lists,
+        OneNote,
+        Operations,
+        Permissions,
+        Root,
+        SharepointIds,
+        SiteCollection,
         Sites,
-        Columns,
-        OneNote;
+        TermStore,
+        TermStores,
+        ;
 
         @Override
         public String getKey() {
