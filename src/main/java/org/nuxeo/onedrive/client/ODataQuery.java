@@ -71,6 +71,29 @@ public class ODataQuery {
         return this;
     }
 
+    public ODataQuery set(final String key, final String value) {
+        builder.set(key, value);
+        return this;
+    }
+
+    public ODataQuery set(final String key, QueryStringCommaParameter value) {
+        final Set<QueryStringCommaParameter> set = getSet("$expand");
+        set.add(value);
+        return this;
+    }
+
+    public ODataQuery set(final String key, QueryStringCommaParameter... values) {
+        final Set<QueryStringCommaParameter> set = getSet("$expand");
+        set.addAll(Arrays.asList(values));
+        return this;
+    }
+
+    public ODataQuery set(final String key, Set<QueryStringCommaParameter> values) {
+        final Set<QueryStringCommaParameter> set = getSet("$expand");
+        set.addAll(values);
+        return this;
+    }
+
     public ODataQuery skip(int skip) {
         builder.set("$skip", skip);
         return this;
