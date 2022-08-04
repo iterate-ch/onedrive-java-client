@@ -17,11 +17,6 @@ public class ODataQuery {
         return builder;
     }
 
-    public ODataQuery count(int count) {
-        builder.set("$count", count);
-        return this;
-    }
-
     public ODataQuery expand(QueryStringCommaParameter value) {
         final Set<QueryStringCommaParameter> set = getSet("$expand");
         set.add(value);
