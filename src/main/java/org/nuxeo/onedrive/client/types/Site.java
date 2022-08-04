@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Site extends BaseItem {
-    private final Site parent;
     private final SiteIdentifier identifier;
+    private final Site parent;
 
     Site(final OneDriveAPI api) {
         super(api);
@@ -32,16 +32,16 @@ public class Site extends BaseItem {
         this.identifier = identifier;
     }
 
-    public static Site byId(final OneDriveAPI api, final String id) {
-        return new Site(api, id, SiteIdentifier.Id);
+    public static Site byHostname(final OneDriveAPI api, final String hostname) {
+        return new Site(api, hostname, null);
     }
 
     public static Site byId(final Site parent, final String id) {
         return new Site(parent, id, SiteIdentifier.Id);
     }
 
-    public static Site byHostname(final OneDriveAPI api, final String hostname) {
-        return new Site(api, hostname, null);
+    public static Site byId(final OneDriveAPI api, final String id) {
+        return new Site(api, id, SiteIdentifier.Id);
     }
 
     public static Site byPath(final Site site, final String path) {
@@ -51,6 +51,41 @@ public class Site extends BaseItem {
     public static Site.Metadata fromJson(final OneDriveAPI api, final JsonObject jsonObject) {
         final String id = jsonObject.get("id").asString();
         return new Site(api, id, SiteIdentifier.Id).new Metadata().fromJson(jsonObject);
+    }
+
+    @Override
+    public String getAction(String action) {
+        String path = getPath();
+        if (SiteIdentifier.Path == identifier) {
+            path += ":";
+        }
+        return path + action;
+    }
+
+    @Deprecated
+    public String getActionPath(final String action) {
+        String path = getBasePath();
+        if (identifier == SiteIdentifier.Path) {
+            path += ":";
+        }
+        path += "/" + action;
+
+        return path;
+    }
+
+    @Deprecated
+    public String getBasePath() {
+        return getPath();
+    }
+
+    @Override
+    public Metadata getMetadata(final ODataQuery query) throws IOException {
+        final URL url = new URLTemplate(getBasePath()).build(getApi().getBaseURL(), query);
+        final OneDriveJsonRequest request = new OneDriveJsonRequest(url, "GET");
+        try (final OneDriveJsonResponse response = request.sendRequest(getApi().getExecutor())) {
+            JsonObject jsonObject = response.getContent();
+            return new Metadata().fromJson(jsonObject);
+        }
     }
 
     @Override
@@ -72,47 +107,8 @@ public class Site extends BaseItem {
         return path;
     }
 
-    @Deprecated
-    public String getBasePath() {
-        return getPath();
-    }
-
-    @Override
-    public String getAction(String action) {
-        String path = getPath();
-        if (SiteIdentifier.Path == identifier) {
-            path += ":";
-        }
-        return path + action;
-    }
-
-    @Override
-    public Metadata getMetadata(final ODataQuery query) throws IOException {
-        final URL url = new URLTemplate(getBasePath()).build(getApi().getBaseURL(), query);
-        final OneDriveJsonRequest request = new OneDriveJsonRequest(url, "GET");
-        try (final OneDriveJsonResponse response = request.sendRequest(getApi().getExecutor())) {
-            JsonObject jsonObject = response.getContent();
-            return new Metadata().fromJson(jsonObject);
-        }
-    }
-
-    @Deprecated
-    public String getActionPath(final String action) {
-        String path = getBasePath();
-        if (identifier == SiteIdentifier.Path) {
-            path += ":";
-        }
-        path += "/" + action;
-
-        return path;
-    }
-
     private boolean isRoot() {
         return null == getId() && null == identifier;
-    }
-
-    private enum SiteIdentifier {
-        Id, Path
     }
 
     public enum Property implements ISiteProperty {
@@ -141,36 +137,27 @@ public class Site extends BaseItem {
         }
     }
 
+    private enum SiteIdentifier {
+        Id, Path
+    }
+
     public interface ISiteProperty extends IBaseItemProperty {
     }
 
     public class Metadata extends BaseItem.Metadata<Metadata> {
-        private Root root;
-        private SharePointIds sharepointIds;
-        private SiteCollection siteCollection;
         private String displayName;
-
         //private Object analytics;
         //private Object contentTypes;
         private Drive.Metadata drive;
         private List<Drive.Metadata> drives;
+        private Root root;
+        private SharePointIds sharepointIds;
+        private SiteCollection siteCollection;
         //private Collection<BaseItem> items;
         //private Collection<Object> lists;
         private List<Metadata> sites;
         //private Collection<Object> columns;
         //private Object oneNote;
-
-        public Root getRoot() {
-            return root;
-        }
-
-        public SharePointIds getSharepointIds() {
-            return sharepointIds;
-        }
-
-        public SiteCollection getSiteCollection() {
-            return siteCollection;
-        }
 
         public String getDisplayName() {
             return displayName;
@@ -184,13 +171,38 @@ public class Site extends BaseItem {
             return drives;
         }
 
+        @Override
+        public Site getItem() {
+            return Site.this;
+        }
+
+        public Root getRoot() {
+            return root;
+        }
+
+        public SharePointIds getSharepointIds() {
+            return sharepointIds;
+        }
+
+        public SiteCollection getSiteCollection() {
+            return siteCollection;
+        }
+
         public List<Metadata> getSites() {
             return sites;
         }
 
-        @Override
-        public Site getItem() {
-            return Site.this;
+        private Drive.Metadata parseDrive(final JsonObject jsonObject) {
+            final String id = jsonObject.get("id").asString();
+            return new Drive(getApi(), id).new Metadata().fromJson(jsonObject);
+        }
+
+        private List<Drive.Metadata> parseDrives(final JsonArray jsonArray) {
+            final ArrayList<Drive.Metadata> drives = new ArrayList<>(jsonArray.size());
+
+            jsonArray.forEach(v -> drives.add(parseDrive(v.asObject())));
+
+            return drives;
         }
 
         @Override
@@ -253,19 +265,6 @@ public class Site extends BaseItem {
                     return false;
             }
             return true;
-        }
-
-        private Drive.Metadata parseDrive(final JsonObject jsonObject) {
-            final String id = jsonObject.get("id").asString();
-            return new Drive(getApi(), id).new Metadata().fromJson(jsonObject);
-        }
-
-        private List<Drive.Metadata> parseDrives(final JsonArray jsonArray) {
-            final ArrayList<Drive.Metadata> drives = new ArrayList<>(jsonArray.size());
-
-            jsonArray.forEach(v -> drives.add(parseDrive(v.asObject())));
-
-            return drives;
         }
 
         private List<Site.Metadata> parseSites(final JsonArray jsonArray) {
