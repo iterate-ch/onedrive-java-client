@@ -8,11 +8,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class DriveItem extends BaseItem {
-    private final ParentReference parent;
     private final ItemIdentifierType itemIdentifierType;
+    private final ParentReference parent;
 
     public DriveItem(Drive parent) {
         // Root Folder of Drive
@@ -49,33 +48,6 @@ public class DriveItem extends BaseItem {
         return item.new Metadata().fromJson(jsonObject);
     }
 
-    public ItemIdentifierType getItemIdentifierType() {
-        return itemIdentifierType;
-    }
-
-    public Drive getDrive() {
-        if (parent instanceof DriveParent) {
-            return ((DriveParent) parent).getParent();
-        }
-        return ((ItemParent) parent).getParent().getDrive();
-    }
-
-    @Override
-    public String getPath() {
-        if (parent instanceof DriveParent) {
-            final DriveParent drive = (DriveParent) parent;
-            if (null == itemIdentifierType) {
-                return drive.getParent().getAction("/root");
-            } else if (ItemIdentifierType.Id == itemIdentifierType) {
-                return drive.getParent().getAction("/items/" + getId());
-            }
-        } else if (parent instanceof ItemParent) {
-            final ItemParent item = (ItemParent) parent;
-            return item.getParent().getAction(":/" + getId()); //TODO Force non-leading slash in Path?
-        }
-        return null;
-    }
-
     public JsonObject createParentReferenceObject() {
         final JsonObject root = new JsonObject();
 
@@ -107,12 +79,39 @@ public class DriveItem extends BaseItem {
         return actionPathBuilder.toString();
     }
 
+    public Drive getDrive() {
+        if (parent instanceof DriveParent) {
+            return ((DriveParent) parent).getParent();
+        }
+        return ((ItemParent) parent).getParent().getDrive();
+    }
+
+    public ItemIdentifierType getItemIdentifierType() {
+        return itemIdentifierType;
+    }
+
     @Override
     public Metadata getMetadata(final ODataQuery query) throws IOException {
         final URL url = new URLTemplate(getPath()).build(getApi().getBaseURL(), query);
         OneDriveJsonRequest request = new OneDriveJsonRequest(url, "GET");
         OneDriveJsonResponse response = request.sendRequest(getApi().getExecutor());
         return new Metadata().fromJson(response.getContent());
+    }
+
+    @Override
+    public String getPath() {
+        if (parent instanceof DriveParent) {
+            final DriveParent drive = (DriveParent) parent;
+            if (null == itemIdentifierType) {
+                return drive.getParent().getAction("/root");
+            } else if (ItemIdentifierType.Id == itemIdentifierType) {
+                return drive.getParent().getAction("/items/" + getId());
+            }
+        } else if (parent instanceof ItemParent) {
+            final ItemParent item = (ItemParent) parent;
+            return item.getParent().getAction(":/" + getId()); //TODO Force non-leading slash in Path?
+        }
+        return null;
     }
 
     public enum ItemIdentifierType {
@@ -165,18 +164,6 @@ public class DriveItem extends BaseItem {
     public interface IDriveItemProperty extends IBaseItemProperty {
     }
 
-    private static abstract class ParentReference<T> {
-        private final T parent;
-
-        ParentReference(T parent) {
-            this.parent = parent;
-        }
-
-        public T getParent() {
-            return parent;
-        }
-    }
-
     private static class DriveParent extends ParentReference<Drive> {
         DriveParent(Drive parent) {
             super(parent);
@@ -189,6 +176,18 @@ public class DriveItem extends BaseItem {
         }
     }
 
+    private static abstract class ParentReference<T> {
+        private final T parent;
+
+        ParentReference(T parent) {
+            this.parent = parent;
+        }
+
+        public T getParent() {
+            return parent;
+        }
+    }
+
     public class Metadata extends BaseItem.Metadata<Metadata> {
         private final Map<Class, Facet> facetMap = new HashMap<>();
         private String cTag;
@@ -196,8 +195,8 @@ public class DriveItem extends BaseItem {
         private Long size;
         private String webDavUrl;
 
-        public Package getPackage() {
-            return getFacet(Package.class);
+        public <T extends Facet> T getFacet(Class<T> clazz) {
+            return (T) facetMap.getOrDefault(clazz, null);
         }
 
         public File getFile() {
@@ -208,24 +207,12 @@ public class DriveItem extends BaseItem {
             return getFacet(Folder.class);
         }
 
+        public Package getPackage() {
+            return getFacet(Package.class);
+        }
+
         public Publication getPublication() {
             return getFacet(Publication.class);
-        }
-
-        public boolean isPackage() {
-            return null != getFacet(Package.class);
-        }
-
-        public boolean isFile() {
-            return null != getFacet(File.class);
-        }
-
-        public boolean isFolder() {
-            return null != getFacet(Folder.class);
-        }
-
-        public String getcTag() {
-            return cTag;
         }
 
         public Metadata getRemoteItem() {
@@ -240,8 +227,20 @@ public class DriveItem extends BaseItem {
             return webDavUrl;
         }
 
-        public <T extends Facet> T getFacet(Class<T> clazz) {
-            return (T) facetMap.getOrDefault(clazz, null);
+        public String getcTag() {
+            return cTag;
+        }
+
+        public boolean isFile() {
+            return null != getFacet(File.class);
+        }
+
+        public boolean isFolder() {
+            return null != getFacet(Folder.class);
+        }
+
+        public boolean isPackage() {
+            return null != getFacet(Package.class);
         }
 
         @Override

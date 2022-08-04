@@ -28,6 +28,12 @@ public class ODataQuery {
         return this;
     }
 
+    public ODataQuery expand(QueryStringCommaParameter... values) {
+        final Set<QueryStringCommaParameter> set = getSet("$expand");
+        set.addAll(Arrays.asList(values));
+        return this;
+    }
+
     public ODataQuery filter(String filter) {
         builder.set("$filter", filter);
         return this;
@@ -49,6 +55,12 @@ public class ODataQuery {
     public ODataQuery select(QueryStringCommaParameter value) {
         final Set<QueryStringCommaParameter> set = getSet("$select");
         set.add(value);
+        return this;
+    }
+
+    public ODataQuery select(QueryStringCommaParameter... value) {
+        final Set<QueryStringCommaParameter> set = getSet("$select");
+        set.addAll(Arrays.asList(value));
         return this;
     }
 
