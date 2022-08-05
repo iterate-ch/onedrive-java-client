@@ -7,7 +7,7 @@ public class ODataQuery {
     private final Map<String, Set<QueryStringCommaParameter>> cache = new HashMap<>();
 
     public static String get(final ODataQuery query) {
-        return Optional.ofNullable(query).map(ODataQuery::build).map(QueryStringBuilder::toString).orElse(null);
+        return Optional.ofNullable(query).map(ODataQuery::build).map(QueryStringBuilder::toString).orElse("");
     }
 
     public QueryStringBuilder build() {
