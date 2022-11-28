@@ -274,6 +274,9 @@ public class DriveItem extends BaseItem {
                     facetMap.put(Folder.class, new Folder().fromJson(member.getValue().asObject()));
                     break;
 
+                case "package":
+                    facetMap.put(Package.class, new Package().fromJson(member.getValue().asObject()));
+
                 case "publication":
                     facetMap.put(Publication.class, new Publication().fromJson(member.getValue().asObject()));
                     break;
