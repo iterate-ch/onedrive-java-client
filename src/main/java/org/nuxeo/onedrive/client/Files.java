@@ -158,8 +158,12 @@ public final class Files {
         new OneDriveRequest(new URLTemplate(item.getPath()).build(item.getApi().getBaseURL()), "DELETE").sendRequest(item.getApi().getExecutor()).close();
     }
 
-    public static void patch(DriveItem item, PatchOperation patch) throws IOException {
-        new OneDriveJsonRequest(new URLTemplate(item.getPath()).build(item.getApi().getBaseURL()), "PATCH", patch.build()).sendRequest(item.getApi().getExecutor()).close();
+    public static DriveItem.Metadata patch(DriveItem item, PatchOperation patch) throws IOException {
+        final URL url = new URLTemplate(item.getPath()).build(item.getApi().getBaseURL());
+        final OneDriveJsonRequest request = new OneDriveJsonRequest(url, "PATCH", patch.build());
+        try (final OneDriveJsonResponse response = request.sendRequest(item.getApi().getExecutor())) {
+            return DriveItem.parseJson(item.getApi(), response.getContent());
+        }
     }
 
     public static void checkout(DriveItem item) throws IOException {
