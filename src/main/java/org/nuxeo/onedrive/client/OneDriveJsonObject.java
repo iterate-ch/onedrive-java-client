@@ -19,7 +19,10 @@
 package org.nuxeo.onedrive.client;
 
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -27,22 +30,13 @@ import java.util.function.Predicate;
  * @since 1.0
  */
 public abstract class OneDriveJsonObject {
+    private final Map<String, JsonValue> additionalData = new HashMap<>();
+
     protected OneDriveJsonObject() {
     }
 
     protected OneDriveJsonObject(JsonObject json) {
         parseMember(json);
-    }
-
-    public final void parseMember(JsonObject json) {
-        parseMember(json, this::parseMember, this::parseMemberUnsafe);
-    }
-
-    protected void parseMember(JsonObject.Member member) {
-    }
-
-    protected boolean parseMemberUnsafe(JsonObject.Member member) {
-        return false;
     }
 
     protected static void parseMember(JsonObject json, Consumer<JsonObject.Member> consumer, Predicate<JsonObject.Member> filterUnsafe) {
@@ -53,6 +47,22 @@ public abstract class OneDriveJsonObject {
                 consumer.accept(member);
             }
         }
+    }
+
+    public Map<String, JsonValue> getAdditionalData() {
+        return additionalData;
+    }
+
+    public final void parseMember(JsonObject json) {
+        parseMember(json, this::parseMember, this::parseMemberUnsafe);
+    }
+
+    protected void parseMember(JsonObject.Member member) {
+        additionalData.put(member.getName(), member.getValue());
+    }
+
+    protected boolean parseMemberUnsafe(JsonObject.Member member) {
+        return false;
     }
 
 }
