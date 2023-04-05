@@ -5,7 +5,8 @@ import com.eclipsesource.json.JsonObject;
 public class Publication extends Facet<Publication> {
     public enum State {
         published,
-        checkout
+        checkout,
+        draft
     }
 
     private State level;
