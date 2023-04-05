@@ -39,12 +39,16 @@ public abstract class OneDriveJsonObject {
         parseMember(json);
     }
 
-    protected static void parseMember(JsonObject json, Consumer<JsonObject.Member> consumer, Predicate<JsonObject.Member> filterUnsafe) {
+    protected static void parseMember(JsonObject json, Consumer<JsonObject.Member> consumer, Predicate<JsonObject.Member> filterUnsafe, Consumer<JsonObject.Member> additionalConsumer) {
         for (JsonObject.Member member : json) {
             if (!filterUnsafe.test(member) && !member.getValue().isNull()) {
                 // parseMember assumes that member.getValue() is never null.
                 // which causes much trouble.
-                consumer.accept(member);
+                try {
+                    consumer.accept(member);
+                } catch (Exception ex) {
+                    additionalConsumer.accept(member);
+                }
             }
         }
     }
@@ -54,15 +58,18 @@ public abstract class OneDriveJsonObject {
     }
 
     public final void parseMember(JsonObject json) {
-        parseMember(json, this::parseMember, this::parseMemberUnsafe);
+        parseMember(json, this::parseMember, this::parseMemberUnsafe, this::addAdditionalData);
     }
 
     protected void parseMember(JsonObject.Member member) {
-        additionalData.put(member.getName(), member.getValue());
+        addAdditionalData(member);
     }
 
     protected boolean parseMemberUnsafe(JsonObject.Member member) {
         return false;
     }
 
+    private final void addAdditionalData(JsonObject.Member member) {
+        additionalData.put(member.getName(), member.getValue());
+    }
 }
