@@ -96,4 +96,12 @@ public class OneDriveAPIException extends IOException {
     public Integer getRetry() {
         return retry;
     }
+
+    @Override
+    public String getMessage() {
+        final StringBuilder builder = new StringBuilder(super.getMessage());
+        builder.append(", Response = ");
+        builder.append(getErrorMessage());
+        return builder.toString();
+    }
 }
