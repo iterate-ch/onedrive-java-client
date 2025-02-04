@@ -31,6 +31,8 @@ public class OneDriveAPIException extends IOException {
 
     private final int responseCode;
     private final String errorMessage;
+    private final JsonObject errorObject;
+
     /**
      * Retry-After header value (in seconds)
      */
@@ -41,6 +43,7 @@ public class OneDriveAPIException extends IOException {
         this.responseCode = -1;
         this.errorMessage = null;
         this.retry = null;
+        this.errorObject = null;
     }
 
     public OneDriveAPIException(String message, Throwable cause) {
@@ -48,6 +51,7 @@ public class OneDriveAPIException extends IOException {
         this.responseCode = -1;
         this.errorMessage = null;
         this.retry = null;
+        this.errorObject = null;
     }
 
     public OneDriveAPIException(String responseMessage, int responseCode) {
@@ -55,6 +59,7 @@ public class OneDriveAPIException extends IOException {
         this.responseCode = responseCode;
         this.errorMessage = null;
         this.retry = null;
+        this.errorObject = null;
     }
 
     public OneDriveAPIException(OneDriveRuntimeException cause) {
@@ -62,6 +67,7 @@ public class OneDriveAPIException extends IOException {
         this.responseCode = cause.getCause().getResponseCode();
         this.errorMessage = cause.getCause().getErrorMessage();
         this.retry = null;
+        this.errorObject = null;
     }
 
     public OneDriveAPIException(final String responseMessage, final int responseCode, final JsonObject error) {
@@ -71,6 +77,7 @@ public class OneDriveAPIException extends IOException {
     public OneDriveAPIException(final String responseMessage, final int responseCode, final JsonObject error, final Integer retry) {
         super(responseMessage);
         this.responseCode = responseCode;
+        this.errorObject = error;
         if(error.get("error").isObject()) {
             this.errorMessage = error.get("error").asObject().get("message").asString();
         }
@@ -98,10 +105,11 @@ public class OneDriveAPIException extends IOException {
     }
 
     @Override
-    public String getMessage() {
-        final StringBuilder builder = new StringBuilder(super.getMessage());
-        builder.append(", Response = ");
-        builder.append(getErrorMessage());
-        return builder.toString();
+    public String toString() {
+        if (errorObject != null) {
+            return errorObject.toString();
+        }
+
+        return super.toString();
     }
 }
