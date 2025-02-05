@@ -22,6 +22,29 @@ public class Publication extends Facet<Publication> {
     }
 
     @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("Publication");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    @Override
+    protected boolean printMembers(StringBuilder builder) {
+        if(super.printMembers(builder)) {
+            builder.append(", ");
+        }
+        builder.append("Level = ");
+        builder.append(level);
+        builder.append(", VersionId = ");
+        builder.append(versionId);
+        return true;
+    }
+
+    @Override
     protected void parseMember(JsonObject.Member member) {
         switch (member.getName()) {
             case "level":

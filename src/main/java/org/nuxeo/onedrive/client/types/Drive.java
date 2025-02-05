@@ -7,7 +7,6 @@ import org.nuxeo.onedrive.client.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Drive extends BaseItem {
@@ -85,6 +84,27 @@ public class Drive extends BaseItem {
         return new Metadata().fromJson(response.getContent());
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("Drive");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    @Override
+    protected boolean printMembers(final StringBuilder builder) {
+        if (super.printMembers(builder)) {
+            builder.append(", ");
+        }
+        builder.append("Parent = ");
+        builder.append(parent);
+        return true;
+    }
+
     public enum DriveType {
         personal, business, documentLibrary
     }
@@ -119,17 +139,56 @@ public class Drive extends BaseItem {
         public T getParent() {
             return parent;
         }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder("DriveParent");
+            builder.append(" { ");
+            if (printMembers(builder)) {
+                builder.append(' ');
+            }
+            builder.append('}');
+            return builder.toString();
+        }
+
+        protected boolean printMembers(final StringBuilder builder) {
+            builder.append("Parent = ");
+            builder.append(parent);
+            return true;
+        }
     }
 
     private static class DirectoryObjectParent extends DriveParent<DirectoryObject> {
         DirectoryObjectParent(DirectoryObject parent) {
             super(parent);
         }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder("DirectoryObjectParent");
+            builder.append(" { ");
+            if (printMembers(builder)) {
+                builder.append(' ');
+            }
+            builder.append('}');
+            return builder.toString();
+        }
     }
 
     private static class SiteParent extends DriveParent<Site> {
         SiteParent(Site parent) {
             super(parent);
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder("SiteParent");
+            builder.append(" { ");
+            if (printMembers(builder)) {
+                builder.append(' ');
+            }
+            builder.append('}');
+            return builder.toString();
         }
     }
 
@@ -174,6 +233,41 @@ public class Drive extends BaseItem {
 
         public List<DriveItem.Metadata> getSpecial() {
             return special;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder("Metadata");
+            builder.append(" { ");
+            if (printMembers(builder)) {
+                builder.append(' ');
+            }
+            builder.append('}');
+            return builder.toString();
+        }
+
+        @Override
+        protected boolean printMembers(final StringBuilder builder) {
+            if (super.printMembers(builder)) {
+                builder.append(", ");
+            }
+            builder.append("DriveType = ");
+            builder.append(driveType);
+            builder.append(", Following = ");
+            builder.append(following);
+            builder.append(", Items = ");
+            builder.append(items);
+            builder.append(", Owner = ");
+            builder.append(owner);
+            builder.append(", Quota = ");
+            builder.append(quota);
+            builder.append(", Root = ");
+            builder.append(root);
+            builder.append(", SharePointIds = ");
+            builder.append(sharePointIds);
+            builder.append(", Special = ");
+            builder.append(special);
+            return true;
         }
 
         @Override

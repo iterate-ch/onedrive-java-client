@@ -25,6 +25,33 @@ public class Hashes extends GraphType<Hashes> {
     }
 
     @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("Hashes");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    @Override
+    protected boolean printMembers(StringBuilder builder) {
+        if(super.printMembers(builder)) {
+            builder.append(", ");
+        }
+        builder.append("CRC32Hash = ");
+        builder.append(crc32Hash);
+        builder.append(", SHA1Hash = ");
+        builder.append(sha1Hash);
+        builder.append(", SHA256hash = ");
+        builder.append(sha256Hash);
+        builder.append(", QuickXorHash = ");
+        builder.append(quickXorHash);
+        return true;
+    }
+
+    @Override
     protected void parseMember(JsonObject.Member member) {
         switch (member.getName()) {
             case "crc32Hash":

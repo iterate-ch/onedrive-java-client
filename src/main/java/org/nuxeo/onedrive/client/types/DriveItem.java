@@ -114,6 +114,30 @@ public class DriveItem extends BaseItem {
         return null;
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("DriveItem");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    @Override
+    protected boolean printMembers(final StringBuilder builder) {
+        if (super.printMembers(builder)) {
+            builder.append(", ");
+        }
+        builder.append("Parent = ");
+        builder.append(parent);
+        builder.append(", ItemIdentifierType = ");
+        builder.append(itemIdentifierType);
+
+        return true;
+    }
+
     public enum ItemIdentifierType {
         Id,
         Path
@@ -168,11 +192,33 @@ public class DriveItem extends BaseItem {
         DriveParent(Drive parent) {
             super(parent);
         }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder("ItemParent");
+            builder.append(" { ");
+            if (printMembers(builder)) {
+                builder.append(' ');
+            }
+            builder.append('}');
+            return builder.toString();
+        }
     }
 
     private static class ItemParent extends ParentReference<DriveItem> {
         ItemParent(DriveItem parent) {
             super(parent);
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder("ItemParent");
+            builder.append(" { ");
+            if (printMembers(builder)) {
+                builder.append(' ');
+            }
+            builder.append('}');
+            return builder.toString();
         }
     }
 
@@ -185,6 +231,23 @@ public class DriveItem extends BaseItem {
 
         public T getParent() {
             return parent;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder("ParentReference");
+            builder.append(" { ");
+            if (printMembers(builder)) {
+                builder.append(' ');
+            }
+            builder.append('}');
+            return builder.toString();
+        }
+
+        protected boolean printMembers(final StringBuilder builder) {
+            builder.append("Parent = ");
+            builder.append(parent);
+            return true;
         }
     }
 
@@ -241,6 +304,35 @@ public class DriveItem extends BaseItem {
 
         public boolean isPackage() {
             return null != getFacet(Package.class);
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder("Metadata");
+            builder.append(" { ");
+            if (printMembers(builder)) {
+                builder.append(' ');
+            }
+            builder.append('}');
+            return builder.toString();
+        }
+
+        @Override
+        protected boolean printMembers(final StringBuilder builder) {
+            if (super.printMembers(builder)) {
+                builder.append(", ");
+            }
+            builder.append("FacetMap = ");
+            builder.append(facetMap);
+            builder.append(", CTag = ");
+            builder.append(cTag);
+            builder.append(", RemoteItem = ");
+            builder.append(remoteItem);
+            builder.append(", Size = ");
+            builder.append(size);
+            builder.append(", WebDavUrl = ");
+            builder.append(webDavUrl);
+            return true;
         }
 
         @Override

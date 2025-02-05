@@ -40,6 +40,31 @@ public class FileSystemInfo extends Facet<FileSystemInfo> {
     }
 
     @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("FileSystemInfo");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    @Override
+    protected boolean printMembers(StringBuilder builder) {
+        if (super.printMembers(builder)) {
+            builder.append(", ");
+        }
+        builder.append("CreatedDateTime = ");
+        builder.append(createdDateTime);
+        builder.append(", LastAccessedDateTime = ");
+        builder.append(lastAccessedDateTime);
+        builder.append(", LastModifiedDateTime = ");
+        builder.append(lastModifiedDateTime);
+        return true;
+    }
+
+    @Override
     protected void parseMember(JsonObject.Member member) {
         JsonValue value = member.getValue();
         String memberName = member.getName();

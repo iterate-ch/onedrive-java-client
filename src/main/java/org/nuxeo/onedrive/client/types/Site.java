@@ -111,6 +111,29 @@ public class Site extends BaseItem {
         return null == getId() && null == identifier;
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("Site");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    @Override
+    protected boolean printMembers(StringBuilder builder) {
+        if (super.printMembers(builder)) {
+            builder.append(", ");
+        }
+        builder.append("Identifier = ");
+        builder.append(identifier);
+        builder.append(", Parent = ");
+        builder.append(parent);
+        return true;
+    }
+
     public enum Property implements ISiteProperty {
         Analytics,
         Columns,
@@ -146,18 +169,18 @@ public class Site extends BaseItem {
 
     public class Metadata extends BaseItem.Metadata<Metadata> {
         private String displayName;
-        //private Object analytics;
-        //private Object contentTypes;
+        // private Object analytics;
+        // private Object contentTypes;
         private Drive.Metadata drive;
         private List<Drive.Metadata> drives;
         private Root root;
         private SharePointIds sharepointIds;
         private SiteCollection siteCollection;
-        //private Collection<BaseItem> items;
-        //private Collection<Object> lists;
+        // private Collection<BaseItem> items;
+        // private Collection<Object> lists;
         private List<Metadata> sites;
-        //private Collection<Object> columns;
-        //private Object oneNote;
+        // private Collection<Object> columns;
+        // private Object oneNote;
 
         public String getDisplayName() {
             return displayName;
@@ -203,6 +226,39 @@ public class Site extends BaseItem {
             jsonArray.forEach(v -> drives.add(parseDrive(v.asObject())));
 
             return drives;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder("Metadata");
+            builder.append(" { ");
+            if (printMembers(builder)) {
+                builder.append(' ');
+            }
+            builder.append('}');
+            return builder.toString();
+        }
+
+        @Override
+        protected boolean printMembers(final StringBuilder builder) {
+            if (super.printMembers(builder)) {
+                builder.append(", ");
+            }
+            builder.append("DisplayName = ");
+            builder.append(displayName);
+            builder.append(", Drive = ");
+            builder.append(drive);
+            builder.append(", Drives = ");
+            builder.append(drives);
+            builder.append(", Root = ");
+            builder.append(root);
+            builder.append(", SharePointIds = ");
+            builder.append(sharepointIds);
+            builder.append(", SiteCollection = ");
+            builder.append(siteCollection);
+            builder.append(", Sites = ");
+            builder.append(sites);
+            return true;
         }
 
         @Override

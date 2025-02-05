@@ -57,6 +57,23 @@ public abstract class OneDriveJsonObject {
         return additionalData;
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("OneDriveJsonObject");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    protected boolean printMembers(final StringBuilder builder) {
+        builder.append("AdditionalData = ");
+        builder.append(additionalData);
+        return true;
+    }
+
     public final void parseMember(JsonObject json) {
         parseMember(json, this::parseMember, this::parseMemberUnsafe, this::addAdditionalData);
     }

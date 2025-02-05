@@ -19,4 +19,15 @@ public abstract class GraphType<T extends GraphType<T>> extends OneDriveJsonObje
 
     protected void populateJsonObject(JsonObject jsonObject) {
     }
+
+    @Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder("GraphType");
+		builder.append(" { ");
+		if (printMembers(builder)) {
+			builder.append(' ');
+		}
+		builder.append('}');
+		return builder.toString();
+	}
 }

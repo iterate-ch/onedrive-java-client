@@ -40,6 +40,39 @@ public class ItemReference extends GraphType<ItemReference> {
     }
 
     @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("ItemReference");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    @Override
+    protected boolean printMembers(StringBuilder builder) {
+        if(super.printMembers(builder)) {
+            builder.append(", ");
+        }
+        builder.append("DriveId = ");
+        builder.append(driveId);
+        builder.append(", DriveType = ");
+        builder.append(driveType);
+        builder.append(", Id = ");
+        builder.append(id);
+        builder.append(", Name = ");
+        builder.append(name);
+        builder.append(", Path = ");
+        builder.append(path);
+        builder.append(", ShareId = ");
+        builder.append(shareId);
+        builder.append(", SharePointIds = ");
+        builder.append(sharePointIds);
+        return true;
+    }
+
+    @Override
     protected void parseMember(JsonObject.Member member) {
         switch (member.getName()) {
             case "driveId":

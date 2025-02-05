@@ -58,6 +58,43 @@ public class Permission extends GraphType<Permission> {
     }
 
     @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("Permission");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    @Override
+    protected boolean printMembers(StringBuilder builder) {
+        if(super.printMembers(builder)) {
+            builder.append(", ");
+        }
+        builder.append("Id = ");
+        builder.append(id);
+        builder.append(", GrantedTo = ");
+        builder.append(grantedTo);
+        builder.append(", GrantedToIdentities = ");
+        builder.append(grantedToIdentities);
+        builder.append(", InheritedFrom = ");
+        builder.append(inheritedFrom);
+        builder.append(", Link = ");
+        builder.append(link);
+        builder.append(", Roles = ");
+        builder.append(roles);
+        builder.append(", ShareId = ");
+        builder.append(shareId);
+        builder.append(", ExpirationDateTime = ");
+        builder.append(expirationDateTime);
+        builder.append(", HasPassword = ");
+        builder.append(hasPassword);
+        return true;
+    }
+
+    @Override
     protected void parseMember(JsonObject.Member member) {
         switch (member.getName()) {
             case "id":

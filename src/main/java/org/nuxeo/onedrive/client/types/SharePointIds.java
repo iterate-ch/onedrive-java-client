@@ -40,6 +40,39 @@ public class SharePointIds extends Facet<SharePointIds> {
     }
 
     @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("SharePointIds");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    @Override
+    protected boolean printMembers(StringBuilder builder) {
+        if(super.printMembers(builder)) {
+            builder.append(", ");
+        }
+        builder.append("ListId = ");
+        builder.append(listId);
+        builder.append(", ListItemId = ");
+        builder.append(listItemId);
+        builder.append(", ListItemUniqueId = ");
+        builder.append(listItemUniqueId);
+        builder.append(", SiteId = ");
+        builder.append(siteId);
+        builder.append(", SiteUrl = ");
+        builder.append(siteUrl);
+        builder.append(", TenantId = ");
+        builder.append(tenantId);
+        builder.append(", WebId = ");
+        builder.append(webId);
+        return true;
+    }
+
+    @Override
     protected void parseMember(JsonObject.Member member) {
         switch (member.getName()) {
             case "listId":

@@ -25,6 +25,33 @@ public class Quota extends GraphType<Quota> {
     }
 
     @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("Quota");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    @Override
+    protected boolean printMembers(StringBuilder builder) {
+        if(super.printMembers(builder)) {
+            builder.append(", ");
+        }
+        builder.append("Deleted = ");
+        builder.append(deleted);
+        builder.append(", Remaining = ");
+        builder.append(remaining);
+        builder.append(", Total = ");
+        builder.append(total);
+        builder.append(", Used = ");
+        builder.append(used);
+        return true;
+    }
+
+    @Override
     protected void parseMember(JsonObject.Member member) {
         switch (member.getName()) {
             case "deleted":

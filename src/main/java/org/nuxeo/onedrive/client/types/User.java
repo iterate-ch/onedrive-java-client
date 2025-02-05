@@ -34,6 +34,27 @@ public class User extends DirectoryObject {
         return getPath() + "/" + operation;
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("User");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    @Override
+    protected boolean printMembers(StringBuilder builder) {
+        if(super.printMembers(builder)) {
+            builder.append(", ");
+        }
+        builder.append("UserIdType = ");
+        builder.append(userIdType);
+        return true;
+    }
+
     enum UserIdType {
         UUID
     }
@@ -73,6 +94,29 @@ public class User extends DirectoryObject {
         @Override
         public User asDirectoryObject() {
             return User.this;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder("Metadata");
+            builder.append(" { ");
+            if (printMembers(builder)) {
+                builder.append(' ');
+            }
+            builder.append('}');
+            return builder.toString();
+        }
+
+        @Override
+        protected boolean printMembers(final StringBuilder builder) {
+            if (super.printMembers(builder)) {
+                builder.append(", ");
+            }
+            builder.append("CreationType = ");
+            builder.append(creationType);
+            builder.append(", UserPrincipalName = ");
+            builder.append(userPrincipalName);
+            return true;
         }
 
         @Override

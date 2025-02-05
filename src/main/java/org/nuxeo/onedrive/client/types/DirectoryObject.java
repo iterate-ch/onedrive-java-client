@@ -1,6 +1,7 @@
 package org.nuxeo.onedrive.client.types;
 
 import com.eclipsesource.json.JsonObject;
+
 import org.nuxeo.onedrive.client.OneDriveAPI;
 import org.nuxeo.onedrive.client.OneDriveAPIException;
 import org.nuxeo.onedrive.client.OneDriveJsonObject;
@@ -37,6 +38,23 @@ public abstract class DirectoryObject {
         }
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("DirectoryObject");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    protected boolean printMembers(final StringBuilder builder) {
+        builder.append("ID = ");
+        builder.append(id);
+        return true;
+    }
+
     public abstract class Metadata extends OneDriveJsonObject {
         private String id;
 
@@ -54,6 +72,27 @@ public abstract class DirectoryObject {
                 return id;
             }
             return DirectoryObject.this.id;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder("Metadata");
+            builder.append(" { ");
+            if (printMembers(builder)) {
+                builder.append(' ');
+            }
+            builder.append('}');
+            return builder.toString();
+        }
+
+        @Override
+        protected boolean printMembers(final StringBuilder builder) {
+            if (super.printMembers(builder)) {
+                builder.append(", ");
+            }
+            builder.append("Id = ");
+            builder.append(id);
+            return true;
         }
 
         @Override

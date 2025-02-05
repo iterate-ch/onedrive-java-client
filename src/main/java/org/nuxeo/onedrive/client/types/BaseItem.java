@@ -37,6 +37,23 @@ public abstract class BaseItem {
 
     public abstract Metadata getMetadata(final ODataQuery query) throws IOException;
 
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("BaseItem");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    protected boolean printMembers(final StringBuilder builder) {
+        builder.append("ID = ");
+        builder.append(id);
+        return true;
+    }
+
     public abstract class Metadata<T extends Metadata<T>> extends GraphType<T> {
         private String id;
         private OneDriveIdentitySet createdBy;
@@ -97,6 +114,45 @@ public abstract class BaseItem {
         }
 
         @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder("Metadata");
+            builder.append(" { ");
+            if (printMembers(builder)) {
+                builder.append(' ');
+            }
+            builder.append('}');
+            return builder.toString();
+        }
+
+        @Override
+        protected boolean printMembers(final StringBuilder builder) {
+            if (super.printMembers(builder)) {
+                builder.append(", ");
+            }
+            builder.append("Id = ");
+            builder.append(id);
+            builder.append(", CreatedBy = ");
+            builder.append(createdBy);
+            builder.append(", CreatedDateTime = ");
+            builder.append(createdDateTime);
+            builder.append(", Description = ");
+            builder.append(description);
+            builder.append(", ETag = ");
+            builder.append(eTag);
+            builder.append(", LastModifiedBy = ");
+            builder.append(lastModifiedBy);
+            builder.append(", LastModifiedDateTime = ");
+            builder.append(lastModifiedDateTime);
+            builder.append(", Name = ");
+            builder.append(name);
+            builder.append(", ParentReference = ");
+            builder.append(parentReference);
+            builder.append(", WebUrl = ");
+            builder.append(webUrl);
+            return true;
+        }
+
+        @Override
         protected void parseMember(JsonObject.Member member) {
             switch (member.getName()) {
                 case "id":
@@ -149,7 +205,6 @@ public abstract class BaseItem {
         Name,
         ParentReference,
         WebUrl;
-
 
         @Override
         public String getKey() {

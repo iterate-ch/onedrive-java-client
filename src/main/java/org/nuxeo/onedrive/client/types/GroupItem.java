@@ -32,6 +32,17 @@ public class GroupItem extends DirectoryObject {
         return new GroupItem(api, jsonObject.get("id").asString()).new Metadata(jsonObject);
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("GroupItem");
+        builder.append(" { ");
+        if (printMembers(builder)) {
+            builder.append(' ');
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
     public class Metadata extends DirectoryObject.Metadata {
         private boolean allowExternalSenders = false;
         private boolean autoSubscribeNewMembers = false;
@@ -129,6 +140,59 @@ public class GroupItem extends DirectoryObject {
 
         public Drive getDrive() {
             return drive;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder("Metadata");
+            builder.append(" { ");
+            if (printMembers(builder)) {
+                builder.append(' ');
+            }
+            builder.append('}');
+            return builder.toString();
+        }
+
+        @Override
+        protected boolean printMembers(final StringBuilder builder) {
+            if (super.printMembers(builder)) {
+                builder.append(", ");
+            }
+            builder.append("AllowExternalSenders = ");
+            builder.append(allowExternalSenders);
+            builder.append(", AutoSubscribeNewMembers = ");
+            builder.append(autoSubscribeNewMembers);
+            builder.append(", CreatedDateTime = ");
+            builder.append(createdDateTime);
+            builder.append(", Description = ");
+            builder.append(description);
+            builder.append(", DisplayName = ");
+            builder.append(displayName);
+            builder.append(", IsSubscribedByMail = ");
+            builder.append(isSubscribedByMail);
+            builder.append(", Mail = ");
+            builder.append(mail);
+            builder.append(", MailEnabled = ");
+            builder.append(mailEnabled);
+            builder.append(", MailNickname = ");
+            builder.append(mailNickname);
+            builder.append(", OnPremisesLastSyncDateTime = ");
+            builder.append(onPremisesLastSyncDateTime);
+            builder.append(", OnPremisesSecurityIdentifier = ");
+            builder.append(onPremisesSecurityIdentifier);
+            builder.append(", OnpremisesSyncEnabled = ");
+            builder.append(onPremisesSyncEnabled);
+            builder.append(", RenewedDateTime = ");
+            builder.append(renewedDateTime);
+            builder.append(", SecurityEnabled = ");
+            builder.append(securityEnabled);
+            builder.append(", UnseenCount = ");
+            builder.append(unseenCount);
+            builder.append(", Visibility = ");
+            builder.append(visibility);
+            builder.append(", Drive = ");
+            builder.append(drive);
+            return true;
         }
 
         @Override
