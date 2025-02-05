@@ -91,7 +91,7 @@ public abstract class DirectoryObject {
                 builder.append(", ");
             }
             builder.append("Id = ");
-            builder.append(id);
+            builder.append(getId());
             return true;
         }
 

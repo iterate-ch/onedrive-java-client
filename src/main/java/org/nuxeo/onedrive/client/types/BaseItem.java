@@ -130,7 +130,7 @@ public abstract class BaseItem {
                 builder.append(", ");
             }
             builder.append("Id = ");
-            builder.append(id);
+            builder.append(getId());
             builder.append(", CreatedBy = ");
             builder.append(createdBy);
             builder.append(", CreatedDateTime = ");
