@@ -63,7 +63,7 @@ public class Hashes extends GraphType<Hashes> {
             case "sha256Hash":
                 sha256Hash = member.getValue().asString();
                 break;
-            case "quickXorhash":
+            case "quickXorHash":
                 quickXorHash = member.getValue().asString();
                 break;
 
