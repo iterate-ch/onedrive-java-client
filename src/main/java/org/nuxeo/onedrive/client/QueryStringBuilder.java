@@ -18,8 +18,6 @@
  */
 package org.nuxeo.onedrive.client;
 
-import sun.swing.StringUIClientPropertyKey;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
