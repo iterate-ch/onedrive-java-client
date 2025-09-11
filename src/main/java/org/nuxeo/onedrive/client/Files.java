@@ -147,9 +147,20 @@ public final class Files {
     }
 
     public static UploadSession createUploadSession(DriveItem item) throws IOException {
+        return createUploadSession(item, null);
+    }
+
+    public static UploadSession createUploadSession(DriveItem item, final CreateUploadSessionOptions options) throws IOException {
         final URL url = getUploadSessionUrl(item);
-        OneDriveJsonRequest request = new OneDriveJsonRequest(url, "POST");
-        try (OneDriveJsonResponse jsonResponse = request.sendRequest(item.getApi().getExecutor(), new NullInputStream(0L))) {
+
+        final OneDriveJsonRequest request;
+        if (options != null) {
+            request = new OneDriveJsonRequest(url, "POST", options.toJson());
+        } else {
+            request = new OneDriveJsonRequest(url, "POST");
+        }
+
+        try (OneDriveJsonResponse jsonResponse = request.sendRequest(item.getApi().getExecutor())) {
             return new UploadSession(item.getApi(), jsonResponse.getContent());
         }
     }
