@@ -109,9 +109,14 @@
                         --add-opens=java.base/java.lang=ALL-UNNAMED
                         --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
                         --add-opens=java.base/java.util=ALL-UNNAMED
-                        --add-opens=java.base/java.text=ALL-UNNAMED
                         --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+                        --add-opens=java.base/java.util.stream=ALL-UNNAMED
+                        --add-opens=java.base/java.text=ALL-UNNAMED
                         --add-opens=java.base/java.net=ALL-UNNAMED
+                        --add-opens=java.base/java.nio=ALL-UNNAMED
+                        --add-opens=java.base/java.nio.charset=ALL-UNNAMED
+                        --add-opens=java.base/java.io=ALL-UNNAMED
+                        --add-opens=java.base/sun.nio.cs=ALL-UNNAMED
                     </argLine>
                 </configuration>
             </plugin>
