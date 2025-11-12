@@ -20,9 +20,9 @@ package org.nuxeo.onedrive.client;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.ParseException;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
@@ -42,6 +42,9 @@ public class OneDriveJsonResponse extends AbstractResponse<JsonObject> {
     public JsonObject getContent() throws IOException {
         try (InputStreamReader in = new InputStreamReader(this.getBody(), StandardCharsets.UTF_8)) {
             return Json.parse(in).asObject();
+        }
+        catch(ParseException e) {
+            throw new OneDriveRuntimeException(new OneDriveAPIException(e.getMessage(), e));
         }
     }
 }
