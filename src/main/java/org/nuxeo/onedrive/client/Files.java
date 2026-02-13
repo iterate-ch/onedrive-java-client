@@ -9,10 +9,7 @@ import org.nuxeo.onedrive.client.types.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public final class Files {
     private static String versionAction(String version) {
@@ -158,11 +155,14 @@ public final class Files {
         new OneDriveRequest(new URLTemplate(item.getPath()).build(item.getApi().getBaseURL()), "DELETE").sendRequest(item.getApi().getExecutor()).close();
     }
 
-    public static DriveItem.Metadata patch(DriveItem item, PatchOperation patch) throws IOException {
+    public static Optional<DriveItem.Metadata> patch(DriveItem item, PatchOperation patch) throws IOException {
         final URL url = new URLTemplate(item.getPath()).build(item.getApi().getBaseURL());
         final OneDriveJsonRequest request = new OneDriveJsonRequest(url, "PATCH", patch.build());
         try (final OneDriveJsonResponse response = request.sendRequest(item.getApi().getExecutor())) {
-            return DriveItem.parseJson(item.getApi(), response.getContent());
+            if (response.getResponseCode() == 200) {
+                return Optional.of(DriveItem.parseJson(item.getApi(), response.getContent()));
+            }
+            return Optional.empty();
         }
     }
 
